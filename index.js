@@ -1,6 +1,6 @@
 'use strict';
 
-const {TARGET, UNSUBSCRIBE} = require('./lib/constants');
+const {TARGET, UNSUBSCRIBE, PATH} = require('./lib/constants');
 const isBuiltin = require('./lib/is-builtin');
 const path = require('./lib/path');
 const isSymbol = require('./lib/is-symbol');
@@ -80,11 +80,15 @@ const onChange = (object, onChange, options = {}) => {
 				if (property === proxyTarget || property === TARGET) {
 					return target;
 				}
+				var path = cache.getPath(target);
+				if (property === PATH) {
+					return path;
+				}
 
 				if (
 					property === UNSUBSCRIBE &&
 					!cache.isUnsubscribed &&
-					cache.getPath(target).length === 0
+					path.length === 0
 				) {
 					cache.unsubscribe();
 					return target;
@@ -200,5 +204,6 @@ const onChange = (object, onChange, options = {}) => {
 
 onChange.target = proxy => proxy[TARGET] || proxy;
 onChange.unsubscribe = proxy => proxy[UNSUBSCRIBE] || proxy;
+onChange.path = proxy => proxy[PATH];
 
 module.exports = onChange;
